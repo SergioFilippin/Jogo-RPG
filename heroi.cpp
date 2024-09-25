@@ -1,104 +1,93 @@
+// INTEGRANTES SERGIO LUIS FILIPPIN 2259500
+//              IGOR LUIS DIAS 2199713
+//              VINICIUS BRANQUINHO 2187258
+
 #include "heroi.h"
 #include <iostream>
 #include <string>
 
-using namespace std;
-
 #ifndef HEROI_H
 #define HEROI_H
 
+using namespace std;
 
-// construtor classe heroi ; Sergio
-Heroi::Heroi(const char* nome, int vida, int forca){
-    :nome(nome), vida(vida), topoMochila(0), pesoAtualMochila(0){
-       // inicializar cinto e mochila com ponteiros nulos ; sergio
-        for (int i = 0; i < CAPACIDADE_MAX_CINTO; i++){
-            cinto[i] = NULL;
-        }
-        for (int i = 0; i < CAPACIDADE_MAX_MOCHILA; i++){
-            mochila[i] = NULL;
-        }
+// Construtor classe herói ; Sergio
+Heroi::Heroi(const string& nome, int vida, int forca)
+    : nome(nome), vida(vida), pesomochila(0), capacidademochila(100), topomochila(0) {
+    // Inicializar cinto e mochila com ponteiros nulos ; Sergio
+    for (int i = 0; i < CAPACIDADE_MAX_CINTO; i++) {
+        cinto[i] = nullptr;
+    }
+
+    // Inicializar a mochila com tamanho inicial grande ; Igor
+    mochila = new Item*[capacidademochila];
+    for (int i = 0; i < capacidademochila; i++) {
+        mochila[i] = nullptr;
     }
 }
 
-//adicionando mochila; sergio
+// Destrutor para liberar a memória alocada dinamicamente ; Vinicius
+Heroi::~Heroi() {
+    delete[] mochila;  // Libera a memória alocada dinamicamente para a mochila
+}
 
-bool Heroi::adicionar_item_mochila(Item* item){
-    if (topoMochila < CAPACIDADE_MAX_MOCHILA){
-        mochila[topoMochila++] = item;
+// Adicionar item à mochila ; Sergio
+bool Heroi::adicionar_item_mochila(Item* item) {
+    if (topomochila < capacidademochila) {
+        mochila[topomochila++] = item;
         return true;
     }
-    return false; // retorna false quando mochila cheia  ; sergio
+    return false; // Retorna false quando mochila cheia (não deve acontecer com expansão infinita) ; Igor
 }
 
-//adicionando cinto; sergio
-bool Heroi::adicionar_item_cinto(Item* item){
-    for(int i = 0; i < CAPACIDADE_MAX_CINTO){
-        if(cinto [i] == NULL)
-        cinto [i] = item;
-        return true;
+// Adicionar item ao cinto ; Sergio
+bool Heroi::adicionar_item_cinto(Item* item) {
+    for (int i = 0; i < CAPACIDADE_MAX_CINTO; i++) {
+        if (cinto[i] == nullptr) {
+            cinto[i] = item;
+            return true;
+        }
     }
+    return false; // Retorna false quando o cinto está cheio ; Sergio
 }
-return false; // retorna false quando cinto cheio ; sergio 
 
-//removendo item cinto ; sergio
-
-bool Heroi::remover_item_cinto(int remove){
-    if(remove >= 0 && remove < CAPACIDADE_MAX_CINTO && cinto[remove] != NULL);
-    Item* retirado = cinto [remove];
-    cinto[indice] = nullptr;
-    return retirado;
-}
-return nullptr; // posição vazia ou indice do cinto invalido ; sergio
-
-Item* Heroi::usar_item_mochila(){
-    if(topoMochila > 0){
-        return mochila[--topoMochila]; // faz a remocao do item do topo da mochila ; sergio
+// Remover item do cinto ; Sergio
+Item* Heroi::remover_item_cinto(int indice) {
+    if (indice >= 0 && indice < CAPACIDADE_MAX_CINTO && cinto[indice] != nullptr) {
+        Item* retirado = cinto[indice];
+        cinto[indice] = nullptr;
+        return retirado;
     }
-    return nullptr; // mochila vazia; sergio
+    return nullptr; // Posição vazia ou índice inválido do cinto ; Sergio
 }
 
-// combate do heroi
-
-void Heroi::ataque(){
-    cout << nome << "esta atacando!" << endl;
+// Usar item da mochila ; Sergio
+Item* Heroi::usar_item_mochila() {
+    if (topomochila > 0) {
+        return mochila[--topomochila]; // Remove o item do topo da mochila ; Sergio
+    }
+    return nullptr; // Mochila vazia ; Sergio
 }
- void Heroi::receberdano(int dano) {
+
+// Ataque do herói ; Sergio
+void Heroi::ataque() {
+    cout << nome << " está atacando!" << endl;
+}
+
+// Receber dano ; Sergio
+void Heroi::receberdano(int dano) {
     vida -= dano;
     if (vida < 0) vida = 0;
-    cout << nome << "recebeu " << dano << "de dano. Pontos vida atual:" << vida <<endl;   
- }
+    cout << nome << " recebeu " << dano << " de dano. Pontos de vida atual: " << vida << endl;
+}
 
-void Heroi::usarpocao(Item* pocao){
-    vida += 30;
-    if(vida > VIDA_MAXIMA){
-        vida = VIDA_MAXIMA;
+// Usar poção ; Sergio
+void Heroi::usarpocao(Item* pocao) {
+    vida += 30;  // Cura 30 pontos de vida ; Sergio
+    if (vida > VIDA_MAXIMA) {
+        vida = VIDA_MAXIMA;  // Limita a vida ao valor máximo ; Sergio
     }
-        cout << nome << "Voce usou uma pocao! Uma parcela dos pontos de vida foi restaurada! " << vida << endl; 
+    cout << nome << " usou uma poção! Pontos de vida restaurados para: " << vida << endl; 
 }
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,51 +1,45 @@
+// INTEGRANTES SERGIO LUIS FILIPPIN 2259500
+//              IGOR LUIS DIAS 2199713
+//              VINICIUS BRANQUINHO 2187258
+
 #ifndef HEROI_H
 #define HEROI_H
-#include <string>
 
+#include <string>
 using namespace std;
 
 class Item;
 
 class Heroi {
-
 public:
     Heroi(const string& nome, int vida, int forca);
+    ~Heroi();  // Destrutor adicionado; sergio
 
-    // Gerenciamento de Item
+    // Gerenciamento de Item ; sergio
     bool adicionar_item_mochila(Item* item);
     bool adicionar_item_cinto(Item* item);
-    Item* remover_item_cinto (int remove);
+    Item* remover_item_cinto(int indice);
     Item* usar_item_mochila();
 
-    // Modo de combate
+    // Modo de combate ; sergio
     void ataque();
     void receberdano(int dano);
     void usarpocao(Item* pocao);
 
-    // Status
-    void vivo() const;
-    void mostrarstatus() const;
-
-    // Inventario
-    void editarinventario();
-
-    int ganharvida() const;
-    const string& nome() const;
-
 private:
+    string nome;   // Nome do herói ; sergio
+    int vida;           // Pontos de vida do herói ; sergio
 
-    string nome;    // Nome do herói
-    int vida;    // Pontos de vida do herói
+    static const int VIDA_MAXIMA = 200; // Vida máxima do herói ; sergio
+    static const int CAPACIDADE_MAX_CINTO = 5; // Capacidade máxima do cinto ; sergio
+    Item* cinto[CAPACIDADE_MAX_CINTO];  // Array de ponteiros para itens no cinto ; sergio
+    
+    int pesomochila;   // Peso atual dos itens na mochila ; sergio
+    Item** mochila;    // Array dinâmico ponteiro para mochila ; sergio
+    int capacidademochila;  // Capacidade da mochila ; sergio
+    int topomochila;        // Topo e acesso da mochila ; sergio
 
-    static const int VIDA_MAXIMA = 200; // Vida máxima do herói; sergio
-    static const int CAPACIDADE_MAX_CINTO = 5; // Capacidade máxima do cinto
-    Item* cinto[CAPACIDADE_MAX_CINTO];  // Array de ponteiros para itens no cinto
-    int pesoAtualMochila;   // Peso atual dos itens no cinto
 
-
-    static const int CAPACIDADE_MAX_MOCHILA = 10;   // Capacidade máxima da mochila
-    Item* mochila[CAPACIDADE_MAX_MOCHILA];  // Array de ponteiros para itens na mochila
-    int topoMochila;
 };
 
-#endif
+#endif 
