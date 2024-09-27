@@ -69,6 +69,36 @@ Item* Heroi::usar_item_mochila() {
     return nullptr; // Mochila vazia ; Sergio
 }
 
+// Getter para pontos de vida do herói ; passado para esse script por Branquinho
+int Heroi::getVida() const {
+    return vida;
+}
+
+// Exibir o status atual do herói ; passado para esse script por Branquinho
+void Heroi::displayStatus() const {
+    cout << "===== Status do Herói =====" << endl;
+    cout << "Nome: " << nome << ", Vida: " << vida << "/" << VIDA_MAXIMA << endl;
+    cout << "Itens no cinto: ";
+    
+    // Exibir os itens no cinto
+    for (int i = 0; i < CAPACIDADE_MAX_CINTO; ++i) {
+        if (cinto[i] != nullptr) {
+            cout << cinto[i]->getNome() << " ";
+        } else {
+            cout << "[Vazio] ";
+        }
+    }
+    cout << endl;
+
+    // Mostrar o item no topo da mochila
+    if (topomochila > 0) {
+        cout << "Item no topo da mochila: " << mochila[topomochila - 1]->getNome() << endl;
+    } else {
+        cout << "Mochila está vazia." << endl;
+    }
+    cout << "============================" << endl;
+}
+
 // Ataque do herói ; Sergio
 void Heroi::ataque() {
     cout << nome << " está atacando!" << endl;
@@ -87,7 +117,7 @@ void Heroi::usarpocao(Item* pocao) {
     if (vida > VIDA_MAXIMA) {
         vida = VIDA_MAXIMA;  // Limita a vida ao valor máximo ; Sergio
     }
-    cout << nome << " usou uma poção! Pontos de vida restaurados para: " << vida << endl; 
+    cout << nome << " usou uma poção! Pontos de vida restaurados para: " << vida << endl;
 }
 
 #endif
