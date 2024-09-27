@@ -1,56 +1,39 @@
-// Mapa.cpp
-#include "Mapa.h"
-#include <iostream>
+#ifndef MAPA_H
+#define MAPA_H
 
-// Construtor
-Mapa::Mapa(int tamanhoCaminho) : tamanhoCaminho(tamanhoCaminho), posicaoAtual(0) {
-    if (tamanhoCaminho > MAX_TAMANHO_MAPA) {
-        this->tamanhoCaminho = MAX_TAMANHO_MAPA;
-    }
-    for (int i = 0; i < this->tamanhoCaminho; ++i) {
-        caminho[i] = Sqm();
-    }
-}
+#include "inimigo.h"
+#include "item.h"
 
-// Adiciona um inimigo no sqm especificado
-void Mapa::adicionarInimigo(int posicao, Inimigo* inimigo) {
-    if (posicao >= 0 && posicao < tamanhoCaminho) {
-        caminho[posicao].inimigo = inimigo;
-        caminho[posicao].vazio = false;
-    }
-}
+// Definição da classe Sqm, que representa cada espaço no mapa
+class Sqm {
+private:
+    Inimigo* inimigo;   // Ponteiro para um inimigo (pode ser nullptr)
+    Item* item; // Ponteiro para um item (pode ser nullptr)
+    bool vazio;         // Se está vazio
 
-// Adiciona um item no sqm especificado
-void Mapa::adicionarItem(int posicao, Item* item) {
-    if (posicao >= 0 && posicao < tamanhoCaminho) {
-        caminho[posicao].item = item;
-        caminho[posicao].vazio = false;
-    }
-}
+public:
+    Sqm(); // Construtor padrão
+    void gerarInimigo(Inimigo* novoInimigo);
+    void gerarItem(Item* novoElemento);
+    bool estaVazio() const;
+    bool temInimigo() const;
+    bool temItem() const;
+    Inimigo* getInimigo() const;
+    Item* getItem() const;
+};
 
-// Move o jogador para o próximo sqm
-bool Mapa::moverParaProximaPosicao() {
-    if (posicaoAtual < tamanhoCaminho - 1) {
-        ++posicaoAtual;
-        return true;
-    }
-    return false;
-}
+class Mapa {
+private:
+    Sqm* caminho;
+    int tamanho;
 
-// Retorna a posição atual do jogador no mapa
-Mapa::Sqm Mapa::getPosicaoAtual() const {
-    return caminho[posicaoAtual];
-}
+public:
+    Mapa(int tamanho); // Construtor que define o tamanho do mapa
+    ~Mapa();           // Destrutor para liberar memória
+    void gerarInimigos();  // Popula o mapa com inimigos aleatórios
+    void gerarItem(); // Popula o mapa com itens (armas ou poções) aleatórios
+    Sqm& getSqm(int posicao); // Feito para o heroi acessar e verificar se tem inimigo ou item
+    int getTamanho() const;   // Retorna o tamanho do mapa
+};
 
-// Verifica se o jogador chegou ao fim do mapa
-bool Mapa::fimDoMapa() const {
-    return posicaoAtual == tamanhoCaminho - 1;
-}
-
-// Destrutor
-Mapa::~Mapa() {
-    for (int i = 0; i < tamanhoCaminho; ++i) {
-        delete caminho[i].inimigo;
-        delete caminho[i].item;
-    }
-}
+#endif

@@ -66,12 +66,12 @@ void Mapa::gerarItem() {
                 char nome[] = "Espada";
                 int peso = 5;
                 int ataque = 20;
-                caminho[i].setElemento(new Arma(nome, peso, ataque));
+                caminho[i].setItem(new Arma(nome, peso, ataque));
             } else { // 50% de chance de ser uma poção
                 char nome[] = "Poção de Vida";
                 int peso = 2;
                 int cura = 30;
-                caminho[i].setElemento(new Pocao(nome, peso, cura));
+                caminho[i].setItem(new Pocao(nome, peso, cura));
             }
         }
     }
