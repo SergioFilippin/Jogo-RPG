@@ -1,36 +1,56 @@
-// Mapa.h
-#ifndef MAPA_H
-#define MAPA_H
+// Mapa.cpp
+#include "Mapa.h"
+#include <iostream>
 
-#include "Inimigo.h"
-#include "Item.h"
+// Construtor
+Mapa::Mapa(int tamanhoCaminho) : tamanhoCaminho(tamanhoCaminho), posicaoAtual(0) {
+    if (tamanhoCaminho > MAX_TAMANHO_MAPA) {
+        this->tamanhoCaminho = MAX_TAMANHO_MAPA;
+    }
+    for (int i = 0; i < this->tamanhoCaminho; ++i) {
+        caminho[i] = Sqm();
+    }
+}
 
-class Mapa {
-private:
-    static const int MAX_TAMANHO_MAPA = 20;       // Tamanho máximo do mapa (número de sqms)
-    struct Sqm {                                  // Estrutura para cada posição do mapa
-        bool vazio;                               // Indica se o sqm está vazio
-        Inimigo* inimigo;                         // Ponteiro para o inimigo (se houver)
-        Item* item;                               // Ponteiro para o item (se houver)
-    };
+// Adiciona um inimigo no sqm especificado
+void Mapa::adicionarInimigo(int posicao, Inimigo* inimigo) {
+    if (posicao >= 0 && posicao < tamanhoCaminho) {
+        caminho[posicao].inimigo = inimigo;
+        caminho[posicao].vazio = false;
+    }
+}
 
-    Sqm caminho[MAX_TAMANHO_MAPA];                // Array de sqms que formam o caminho do mapa
-    int tamanhoCaminho;                           // Tamanho do caminho atual
-    int posicaoAtual;                             // Posição atual do jogador no caminho
+// Adiciona um item no sqm especificado
+void Mapa::adicionarItem(int posicao, Item* item) {
+    if (posicao >= 0 && posicao < tamanhoCaminho) {
+        caminho[posicao].item = item;
+        caminho[posicao].vazio = false;
+    }
+}
 
-public:
-    // Construtor
-    Mapa(int tamanhoCaminho);
+// Move o jogador para o próximo sqm
+bool Mapa::moverParaProximaPosicao() {
+    if (posicaoAtual < tamanhoCaminho - 1) {
+        ++posicaoAtual;
+        return true;
+    }
+    return false;
+}
 
-    // Métodos de manipulação do mapa
-    void adicionarInimigo(int posicao, Inimigo* inimigo);  // Adiciona um inimigo no sqm especificado
-    void adicionarItem(int posicao, Item* item);           // Adiciona um item no sqm especificado
-    bool moverParaProximaPosicao();                        // Move o jogador para o próximo sqm
-    Sqm getPosicaoAtual() const;                           // Retorna a posição atual do jogador no mapa
-    bool fimDoMapa() const;                                // Verifica se o jogador chegou ao fim do mapa
+// Retorna a posição atual do jogador no mapa
+Mapa::Sqm Mapa::getPosicaoAtual() const {
+    return caminho[posicaoAtual];
+}
 
-    // Destrutor
-    ~Mapa();
-};
+// Verifica se o jogador chegou ao fim do mapa
+bool Mapa::fimDoMapa() const {
+    return posicaoAtual == tamanhoCaminho - 1;
+}
 
-#endif // MAPA_H
+// Destrutor
+Mapa::~Mapa() {
+    for (int i = 0; i < tamanhoCaminho; ++i) {
+        delete caminho[i].inimigo;
+        delete caminho[i].item;
+    }
+}
