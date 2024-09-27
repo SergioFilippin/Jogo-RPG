@@ -26,6 +26,9 @@ public:
     void receberdano(int dano);
     void usarpocao(Item* pocao);
 
+    int getVida() const;  // Adiciona um getter para vida ; alterado por Branquinho
+    void displayStatus() const;  // Mostra o status do herói ; passado para esse script por Branquinho
+
 private:
     string nome;   // Nome do herói ; sergio
     int vida;           // Pontos de vida do herói ; sergio
