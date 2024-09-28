@@ -12,7 +12,7 @@
 using namespace std;  // Simplifica a manipulação de strings e streams
 
 // Construtor do Jogo ; passado para esse script por Branquinho
-Jogo::Jogo(Heroi* heroi) : heroi(heroi), numInimigos(0), numItens(0), nivelAtual(0) {
+Jogo::Jogo(Heroi* heroi) : heroi(heroi), numInimigos(0), numItens(0), nivelAtual(0), mapaAtual(nullptr) {
     srand(time(0)); // Inicializa a semente para números randômicos
     gerarInimigos();  // Gera inimigos para o jogo
     gerarItens();     // Gera itens para o jogo
@@ -66,13 +66,14 @@ void Jogo::batalha(Inimigo* inimigo) {
     // Verificar o resultado da batalha
     if (heroi->getVida() <= 0) {
         cout << "Você foi derrotado! Fim de jogo." << endl;
+        salvarPontuacao();  // Salva a pontuação antes de finalizar ; passado para esse script por Branquinho
         exit(0);  // Finaliza o jogo se o herói morrer
     } else {
         cout << "Você venceu a batalha contra " << inimigo->getNome() << "!" << endl;
     }
 }
 
-// Função para interagir com um item encontrado ; passado para esse script por Branquinho
+// Função para interagir com um item encontrado ; já implementada por Branquinho
 void Jogo::interagirComItem(Item* item) {
     cout << "Você encontrou um item: " << item->getNome() << endl;
     cout << "Deseja guardar o item no cinto (1), na mochila (2) ou descartá-lo (3)?" << endl;
@@ -100,21 +101,70 @@ void Jogo::interagirComItem(Item* item) {
     }
 }
 
-// Função para iniciar o jogo e gerenciar as interações ; passado para esse script por Branquinho
+// Função para mover o herói de um sqm para outro ; passado para esse script por Branquinho
+void Jogo::mover() {
+    int posicaoAtual = 0;
+    mapaAtual = new Mapa(10); // Exemplo com 10 sqms no mapa ; passado para esse script por Branquinho
+    mapaAtual->gerarInimigos();  // Popula o mapa com inimigos
+    mapaAtual->gerarItem();  // Popula o mapa com itens
+
+    while (posicaoAtual < mapaAtual->getTamanho()) {
+        Sqm& sqmAtual = mapaAtual->getSqm(posicaoAtual);
+        cout << "Você está no sqm " << posicaoAtual << endl;
+
+        // Verifica se o sqm tem um inimigo
+        if (sqmAtual.temInimigo()) {
+            Inimigo* inimigo = sqmAtual.getInimigo();
+            cout << "Você encontrou um inimigo: " << inimigo->getNome() << endl;
+            batalha(inimigo);  // Inicia uma batalha com o inimigo
+        }
+
+        // Verifica se o sqm tem um item
+        if (sqmAtual.temItem()) {
+            Item* item = sqmAtual.getItem();
+            cout << "Você encontrou um item: " << item->getNome() << endl;
+            interagirComItem(item);  // Interage com o item
+        }
+
+        // Se o sqm estiver vazio
+        if (sqmAtual.estaVazio()) {
+            cout << "Este sqm está vazio. Avance para o próximo." << endl;
+        }
+
+        posicaoAtual++;
+    }
+
+    cout << "Você completou o nível!" << endl;
+    avancarNivel();  // Avança para o próximo nível ; passado para esse script por Branquinho
+}
+
+// Função para avançar para o próximo nível ; passado para esse script por Branquinho
+void Jogo::avancarNivel() {
+    nivelAtual++;
+    cout << "Você avançou para o nível " << nivelAtual << "!" << endl;
+
+    // Recalcular dificuldade, aumentar inimigos ou tornar os inimigos mais fortes
+    gerarInimigos();
+    gerarItens();
+}
+
+// Função para salvar as pontuações no arquivo ; passado para esse script por Branquinho
+void Jogo::salvarPontuacao() {
+    ofstream arquivo("high_scores.txt", ios::app);  // Abre o arquivo em modo de append
+    if (arquivo.is_open()) {
+        arquivo << heroi->getNome() << " - Nível alcançado: " << nivelAtual << endl;
+        arquivo.close();
+    } else {
+        cout << "Não foi possível abrir o arquivo high_scores.txt." << endl;
+    }
+}
+
+// Função para iniciar o jogo e gerenciar as interações ; já implementada por Branquinho
 void Jogo::iniciar() {
     cout << "Bem-vindo ao jogo! O herói está pronto para a aventura!" << endl;
     heroi->displayStatus();
 
-    // Aqui o jogo pode começar a fazer as interações com inimigos ou itens (apenas uma simulação)
-    // Normalmente, seria feito com a movimentação no mapa
-
-    // Simulação: Encontrando um inimigo
-    Inimigo* inimigo = inimigos[0];  // Pegamos o primeiro inimigo para iniciar a batalha
-    batalha(inimigo);  // Chama a função de batalha
-
-    // Simulação: Encontrando um item
-    Item* item = itens[0];  // Pegamos o primeiro item para interagir
-    interagirComItem(item);  // Chama a função de interação com o item
+    mover();  // Chama a função para mover o herói pelo mapa ; passado para esse script por Branquinho
 }
 
 // Gerar inimigos aleatoriamente ; já implementada por Branquinho
@@ -143,6 +193,7 @@ void Jogo::gerarItens() {
 // Destrutor do Jogo ; já implementada por Branquinho
 Jogo::~Jogo() {
     delete heroi;
+    delete mapaAtual;  // Liberar a memória alocada para o mapa ; passado para esse script por Branquinho
     for (int i = 0; i < numInimigos; ++i) {
         delete inimigos[i];
     }
