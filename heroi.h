@@ -1,48 +1,45 @@
-// INTEGRANTES SERGIO LUIS FILIPPIN 2259500
-//              IGOR LUIS DIAS 2199713
-//              VINICIUS BRANQUINHO 2187258
-
 #ifndef HEROI_H
 #define HEROI_H
 
 #include <string>
-using namespace std;
-
-class Item;
+#include "Item.h" // Certifique-se de incluir o header de Item
 
 class Heroi {
 public:
-    Heroi(const string& nome, int vida, int forca);
-    ~Heroi();  // Destrutor adicionado; sergio
+    // Construtor
+    Heroi(const std::string& nome, int vida, int forca);
 
-    // Gerenciamento de Item ; sergio
-    bool adicionar_item_mochila(Item* item);
-    bool adicionar_item_cinto(Item* item);
-    Item* remover_item_cinto(int indice);
-    Item* usar_item_mochila();
+    // Gerenciamento de Item
+    bool adicionar_item_mochila(Item* item);   // Adiciona item à mochila
+    bool adicionar_item_cinto(Item* item);     // Adiciona item ao cinto
+    Item* remover_item_cinto(int indice);      // Remove item do cinto por índice
+    Item* usar_item_mochila();                 // Usa o item no topo da mochila
 
-    // Modo de combate ; sergio
-    void ataque();
-    void receberdano(int dano);
-    void usarpocao(Item* pocao);
+    // Métodos de combate
+    void ataque();                             // Herói ataca
+    void receberdano(int dano);                // Herói recebe dano
+    void usarpocao(Item* pocao);               // Herói usa uma poção
 
-    int getVida() const;  // Adiciona um getter para vida ; alterado por Branquinho
-    void displayStatus() const;  // Mostra o status do herói ; passado para esse script por Branquinho
+    // Métodos de acesso (getters)
+    int getVida() const;                       // Retorna a vida atual do herói
+    int getForca() const;                      // Retorna a força do herói
 
 private:
-    string nome;   // Nome do herói ; sergio
-    int vida;           // Pontos de vida do herói ; sergio
+    std::string nome;                          // Nome do herói
+    int vida;                                  // Pontos de vida do herói
+    int forca;                                 // Força do herói
 
-    static const int VIDA_MAXIMA = 200; // Vida máxima do herói ; sergio
-    static const int CAPACIDADE_MAX_CINTO = 5; // Capacidade máxima do cinto ; sergio
-    Item* cinto[CAPACIDADE_MAX_CINTO];  // Array de ponteiros para itens no cinto ; sergio
-    
-    int pesomochila;   // Peso atual dos itens na mochila ; sergio
-    Item** mochila;    // Array dinâmico ponteiro para mochila ; sergio
-    int capacidademochila;  // Capacidade da mochila ; sergio
-    int topomochila;        // Topo e acesso da mochila ; sergio
+    // Definição das constantes de capacidade
+    static const int VIDA_MAXIMA = 200;             // Vida máxima do herói
+    static const int CAPACIDADE_MAX_CINTO = 5;      // Capacidade máxima do cinto
+    static const int CAPACIDADE_MAX_MOCHILA = 10;   // Capacidade máxima da mochila
+    static const int CAPACIDADE_MAX_PESO_MOCHILA = 100; // Peso máximo que a mochila pode carregar
 
-
+    // Cinto e Mochila
+    Item* cinto[CAPACIDADE_MAX_CINTO];        // Array de ponteiros para itens no cinto
+    Item* mochila[CAPACIDADE_MAX_MOCHILA];    // Array de ponteiros para itens na mochila
+    int topoMochila;                          // Controle do topo da mochila (usado como uma pilha)
+    int pesoAtualMochila;                     // Peso atual da mochila
 };
 
-#endif 
+#endif // HEROI_H

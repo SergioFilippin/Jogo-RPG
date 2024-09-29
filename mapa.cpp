@@ -1,91 +1,124 @@
-// Mapa.cpp
-#include "mapa.h"
+#include "Mapa.h"
+#include <iostream>
 #include <cstdlib>
 #include <ctime>
-#include <iostream>
 
-// Construtor padrão ; passado para esse script por Branquinho
-Sqm::Sqm() : inimigo(nullptr), item(nullptr), vazio(true) {}
+using namespace std;
 
-// Define o inimigo no sqm ; passado para esse script por Branquinho
-void Sqm::setInimigo(Inimigo* novoInimigo) {
-    inimigo = novoInimigo;
-    vazio = false;  // O sqm não está mais vazio
+Mapa::Mapa(bool aleatorio, int tamanhoFixo) : posicaoAtual(0), caminho(nullptr) {
+    srand(static_cast<unsigned int>(time(nullptr))); // Semente para a geração aleatória
+
+    if (aleatorio) {
+        // Gera tamanho aleatório do caminho
+        tamanhoCaminho = MIN_TAMANHO_MAPA + rand() % (MAX_TAMANHO_MAPA - MIN_TAMANHO_MAPA + 1);
+        cout << "Tamanho do mapa gerado aleatoriamente: " << tamanhoCaminho << endl;
+    } else {
+        // Define o tamanho fixo
+        tamanhoCaminho = tamanhoFixo;
+        cout << "Tamanho do mapa escolhido: " << tamanhoCaminho << endl;
+    }
+
+    // Verificação de alocação do caminho
+    if (tamanhoCaminho <= 0) {
+        cout << "Erro: tamanho do caminho inválido!" << endl;
+        return;
+    }
+
+    // Aloca dinamicamente o array do caminho
+    caminho = new Sqm[tamanhoCaminho];
+    for (int i = 0; i < tamanhoCaminho; ++i) {
+        caminho[i].vazio = true;
+        caminho[i].inimigo = nullptr;
+        caminho[i].item = nullptr;
+    }
+    cout << "Mapa inicializado com sucesso. Tamanho do caminho: " << tamanhoCaminho << endl;
 }
 
-// Define o item no sqm ; passado para esse script por Branquinho
-void Sqm::setItem(Item* novoElemento) {
-    item = novoElemento;
-    vazio = false;  // O sqm não está mais vazio
-}
-
-bool Sqm::estaVazio() const {
-    return vazio;
-}
-
-bool Sqm::temInimigo() const {
-    return inimigo != nullptr;
-}
-
-bool Sqm::temItem() const {
-    return item != nullptr;
-}
-
-Inimigo* Sqm::getInimigo() const {
-    return inimigo;
-}
-
-Item* Sqm::getItem() const {
-    return item;
-}
-
-// Construtor da classe Mapa ; passado para esse script por Branquinho
-Mapa::Mapa(int tamanho) : tamanho(tamanho) {
-    caminho = new Sqm[tamanho]; // Aloca o array de sqms
-    srand(time(0)); // Inicializa o gerador de números aleatórios
-}
-
-// Destrutor da classe Mapa ; passado para esse script por Branquinho
-Mapa::~Mapa() {
-    delete[] caminho; // Libera a memória do array de sqms
-}
-
-// Gera inimigos aleatórios no mapa ; já implementado por Branquinho
-void Mapa::gerarInimigos() {
-    for (int i = 0; i < tamanho; i++) {
-        if (rand() % 2 == 0) {  // 50% de chance de ter um inimigo
-            char nome[] = "Inimigo";
-            int vida = 50 + (rand() % 50);  // Vida entre 50 e 100
-            int ataque = 10 + (rand() % 10);  // Ataque entre 10 e 20
-            caminho[i].setInimigo(new Inimigo(nome, vida, ataque));  // Adiciona o inimigo ao sqm
-        }
+void Mapa::adicionarInimigo(int posicao, Inimigo* inimigo) {
+    if (posicao >= 0 && posicao < tamanhoCaminho) {
+        caminho[posicao].vazio = false;
+        caminho[posicao].inimigo = inimigo;
+        cout << "Inimigo adicionado no sqm " << posicao << endl;
+    } else {
+        cout << "Erro: posição inválida para adicionar inimigo!" << endl;
     }
 }
 
-// Gera itens aleatórios no mapa (armas e poções) ; já implementado por Branquinho
-void Mapa::gerarItem() {
-    for (int i = 0; i < tamanho; i++) {
-        if (rand() % 2 == 0) {  // 50% de chance de ter um item
-            if (rand() % 2 == 0) {  // 50% de chance de ser uma arma
-                char nome[] = "Espada";
-                int peso = 5;
-                int ataque = 20;
-                caminho[i].setItem(new Arma(nome, peso, ataque));  // Adiciona a arma ao sqm
-            } else {  // 50% de chance de ser uma poção
-                char nome[] = "Poção de Vida";
-                int peso = 2;
-                int cura = 30;
-                caminho[i].setItem(new Pocao(nome, peso, cura));  // Adiciona a poção ao sqm
+void Mapa::adicionarItem(int posicao, Item* item) {
+    if (posicao >= 0 && posicao < tamanhoCaminho) {
+        caminho[posicao].vazio = false;
+        caminho[posicao].item = item;
+        cout << "Item adicionado no sqm " << posicao << endl;
+    } else {
+        cout << "Erro: posição inválida para adicionar item!" << endl;
+    }
+}
+
+bool Mapa::moverParaProximaPosicao() {
+    if (posicaoAtual < tamanhoCaminho - 1) {
+        ++posicaoAtual;
+        cout << "Movendo para a posição " << posicaoAtual << endl;
+
+        // Aleatoriedade para definir o evento neste sqm
+        int eventoAleatorio = rand() % 4;  // Valores 0 a 3
+        cout << "Gerando evento para o sqm " << posicaoAtual << endl;
+        
+        if (eventoAleatorio == 0) {
+            // Gera um inimigo aleatório
+            int tipoInimigo = rand() % 3;  // 0, 1 ou 2 para tipos de inimigos
+            cout << "Inimigo gerado no sqm " << posicaoAtual << endl;
+            if (tipoInimigo == 0) {
+                adicionarInimigo(posicaoAtual, new Inimigo("Morcego Mutante", 50, 10));
+            } else if (tipoInimigo == 1) {
+                adicionarInimigo(posicaoAtual, new Inimigo("Zumbi", 30, 5));
+            } else {
+                adicionarInimigo(posicaoAtual, new Inimigo("Pincher", 40, 7));
             }
+        } else if (eventoAleatorio == 1) {
+            // Gera uma arma aleatória
+            int tipoArma = rand() % 2;
+            cout << "Arma gerada no sqm " << posicaoAtual << endl;
+            if (tipoArma == 0) {
+                adicionarItem(posicaoAtual, new Arma("Machado", 5, 15));
+            } else {
+                adicionarItem(posicaoAtual, new Arma("Espada", 3, 10));
+            }
+        } else if (eventoAleatorio == 2) {
+            // Gera uma poção aleatória
+            int tipoPocao = rand() % 2;
+            cout << "Poção gerada no sqm " << posicaoAtual << endl;
+            if (tipoPocao == 0) {
+                adicionarItem(posicaoAtual, new Pocao("Poção Pequena", 1, 10));
+            } else {
+                adicionarItem(posicaoAtual, new Pocao("Poção Grande", 3, 30));
+            }
+        } else {
+            // O sqm fica vazio
+            caminho[posicaoAtual].vazio = true;
+            cout << "Você encontrou um sqm vazio." << endl;
         }
+
+        return true;
     }
+    cout << "Fim do mapa atingido." << endl;
+    return false; // Se não houver mais posições, retorna falso
 }
 
-// Retorna a referência de um sqm no mapa ; já implementado por Branquinho
-Sqm& Mapa::getSqm(int posicao) {
-    return caminho[posicao];
+Mapa::Sqm Mapa::getPosicaoAtual() const {
+    return caminho[posicaoAtual];
 }
 
-int Mapa::getTamanho() const {
-    return tamanho;
+bool Mapa::fimDoMapa() const {
+    return posicaoAtual == tamanhoCaminho - 1;
+}
+
+Mapa::~Mapa() {
+    if (caminho) {
+        for (int i = 0; i < tamanhoCaminho; ++i) {
+            delete caminho[i].inimigo;
+            delete caminho[i].item;
+        }
+        delete[] caminho;
+        cout << "Mapa destruído com sucesso." << endl;
+    }
 }

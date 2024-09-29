@@ -1,10 +1,10 @@
-// Jogo.h
 #ifndef JOGO_H
 #define JOGO_H
 
-#include "Heroi.h"
-#include "Inimigo.h"
-#include "Item.h"
+#include "Heroi.h"   // Incluir o herói
+#include "Inimigo.h" // Incluir inimigos
+#include "Item.h"    // Incluir itens
+#include "Mapa.h"    // Incluir o mapa
 
 class Jogo {
 private:
