@@ -1,3 +1,6 @@
+//INTEGRANTES SERGIO LUIS FILIPPIN 2259500
+//              IGOR LUIS DIAS 2199713
+//              VINICIUS BRANQUINHO 2187258
 #ifndef MAPA_H
 #define MAPA_H
 
@@ -28,4 +31,4 @@ private:
     int posicaoAtual;
 };
 
-#endif // MAPA_H
+#endif

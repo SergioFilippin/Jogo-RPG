@@ -1,202 +1,338 @@
+//INTEGRANTES SERGIO LUIS FILIPPIN 2259500
+//              IGOR LUIS DIAS 2199713
+//              VINICIUS BRANQUINHO 2187258
 #include "Jogo.h"
 #include "Mapa.h"
 #include <iostream>
-#include <cstdlib> // Para rand e srand
-#include <ctime>   // Para time
+#include <cstdlib>
+#include <ctime>
+
+#ifdef _WIN32
+    #include <windows.h>
+#else
+    #include <unistd.h>
+#endif
 
 using namespace std;
 
 Jogo::Jogo(Heroi* heroi) : heroi(heroi), numInimigos(0), numItens(0), nivelAtual(0) {
-    srand(static_cast<unsigned int>(time(nullptr))); // Semente para geração aleatória
+    srand(static_cast<unsigned int>(time(NULL))); // Semente para geração aleatória
+}
+
+void limparConsole() {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
 }
 
 void Jogo::iniciar() {
-    cout << "Bem-vindo ao RPG! \n";
+    cout << "Bem-vindo ao mundo da Forja! \n";
 
-    // Inicializar o mapa
+    string nomeHeroi;
+    cout << "Digite o nome do seu pequenino heroi: ";
+    getline(cin, nomeHeroi);
+
+    limparConsole();
+
+    string resposta;
+    cout << "Deseja iniciar sua jornada, " << nomeHeroi << "? (sim/nao): ";
+    cin >> resposta;
+
+    if (resposta != "sim") {
+        cout << "A jornada foi encerrada. Ate a proxima!" << endl;
+        return;
+    }
+
     int tamanhoMapa;
-    cout << "Escolha o tamanho do mapa (1 a 20): ";
+    cout << "Escolha o tamanho da terra intermedia (1 a 20):";
     cin >> tamanhoMapa;
     if (tamanhoMapa < 1 || tamanhoMapa > 20) {
-        tamanhoMapa = 20; // Tamanho padrão se o valor estiver fora do intervalo
+        cout << "Tamanho do mapa invalido! Definindo para 20 por padrao.\n";
+        tamanhoMapa = 20;
     }
 
-    cout << "Criando o mapa...\n";
-    Mapa mapa(tamanhoMapa); // Criar o mapa
+    Mapa mapa(false, tamanhoMapa);
+    limparConsole();
 
-    cout << "Mapa criado com sucesso!\n";
-    cout << "Iniciando o loop do jogo...\n";
+    while (!mapa.fimDoMapa()) {
+        cout << "Gostaria de prosseguir em frente, pequeno aventureiro? (sim/nao): ";
+        cin >> resposta;
 
-    // Loop do jogo
-    while (!nivelCompleto()) {
-        cout << "Você está no nível " << nivelAtual + 1 << endl;
-        
-        while (!mapa.fimDoMapa()) {
-            cout << "Movendo para o próximo sqm...\n";
-            if (!mapa.moverParaProximaPosicao()) {
-                cout << "Fim do mapa atingido!\n";
-                break;
-            }
-            Mapa::Sqm posicaoAtual = mapa.getPosicaoAtual();
-
-            if (posicaoAtual.vazio) {
-                cout << "Você encontrou um sqm vazio." << endl;
-            } 
-            else if (posicaoAtual.item != nullptr) {
-                cout << "Você encontrou um item: " << posicaoAtual.item->getNome() << endl;
-                interagirComItem(posicaoAtual.item);
-            } 
-            else if (posicaoAtual.inimigo != nullptr) {
-                cout << "Você encontrou um inimigo: " << posicaoAtual.inimigo->getNome() << endl;
-                batalha(posicaoAtual.inimigo);
-            }
+        if (resposta != "sim") {
+            cout << "A jornada foi encerrada. Ate a proxima!" << endl;
+            return;
         }
 
-        cout << "Você completou o nível!" << endl;
-        avancarNivel();
-    }
-}
+        limparConsole();
 
-void Jogo::avancarNivel() {
-    cout << "Avançando para o próximo nível...\n";
-    
-    // Incrementa o nível atual
-    nivelAtual++;
-
-    // Se o jogador completar todos os níveis, finalizar o jogo
-    if (nivelAtual >= MAX_NIVEIS) {
-        cout << "Parabéns! Você completou todos os níveis!" << endl;
-        exit(0); // Finaliza o jogo
-    } else {
-        cout << "Gerando inimigos e itens para o próximo nível...\n";
-
-        // Libera os itens e inimigos anteriores
-        for (int i = 0; i < numInimigos; ++i) {
-            cout << "Liberando memória do inimigo...\n";
-            delete inimigos[i];
-        }
-        numInimigos = 0;
-
-        for (int i = 0; i < numItens; ++i) {
-            cout << "Liberando memória do item...\n";
-            delete itens[i];
-        }
-        numItens = 0;
-
-        // Gera novos inimigos e itens para o próximo nível
-        gerarInimigos();
-        gerarItens();
-        cout << "Novo nível gerado!\n";
-    }
-}
-
-bool Jogo::nivelCompleto() const {
-    return numInimigos == 0; // Verifica se ainda existem inimigos
-}
-
-void Jogo::gerarInimigos() {
-    // Exemplo de geração de inimigos
-    for (int i = 0; i < MAX_INIMIGOS; ++i) {
-        Inimigo* novoInimigo = nullptr;
-        int tipo = rand() % 3; // Aleatório entre 0 e 2
-
-        if (tipo == 0) {
-            novoInimigo = new Inimigo("Morcego Mutante", 50, 10); // Exemplo de atributos
-        } else if (tipo == 1) {
-            novoInimigo = new Inimigo("Zumbi", 30, 5);
-        } else {
-            novoInimigo = new Inimigo("Pincher", 40, 7);
-        }
-
-        inimigos[numInimigos++] = novoInimigo; // Adicionar o novo inimigo ao array
-    }
-}
-
-void Jogo::gerarItens() {
-    // Exemplo de geração de itens
-    for (int i = 0; i < MAX_ITENS; ++i) {
-        Item* novoItem = nullptr;
-        int tipo = rand() % 2; // Aleatório entre 0 e 1
-
-        if (tipo == 0) {
-            novoItem = new Arma("Machado", 5, 15); // Exemplo de atributos
-        } else {
-            novoItem = new Arma("Espada", 3, 10);
-        }
-
-        itens[numItens++] = novoItem; // Adicionar o novo item ao array
-    }
-}
-
-void Jogo::batalha(Inimigo* inimigo) {
-    // Exemplo de lógica de batalha
-    cout << "Você está em batalha contra " << inimigo->getNome() << "!" << endl;
-
-    // Loop da batalha até que um dos dois perca todos os pontos de vida
-    while (heroi->getVida() > 0 && inimigo->estaVivo()) {
-        heroi->ataque();
-        inimigo->receberDano(heroi->getForca());
-
-        if (!inimigo->estaVivo()) {
-            cout << "Você derrotou o inimigo!" << endl;
-            numInimigos--; // Reduz o número de inimigos restantes no nível
+        if (!mapa.moverParaProximaPosicao()) {
             break;
         }
 
-        inimigo->atacar();
-        heroi->receberdano(inimigo->getCapacidadeDeAtaque());
+        Mapa::Sqm posicaoAtual = mapa.getPosicaoAtual();
 
-        if (heroi->getVida() <= 0) {
-            cout << "Você foi derrotado!" << endl;
-            exit(0); // Finaliza o jogo se o herói perder
+        if (posicaoAtual.vazio) {
+            cout << "Voce encontrou um caminho vazio." << endl;
+            organizarItens();
+        } else if (posicaoAtual.item != NULL) {
+            cout << "O item encontrado foi: " << posicaoAtual.item->getNome() << endl;
+            interagirComItem(posicaoAtual.item);
+        } else if (posicaoAtual.inimigo != NULL) {
+            cout << "O inimigo " << posicaoAtual.inimigo->getNome() << " emergiu das sombras!" << endl;
+            cout << "Prepare-se para a batalha!" << endl;
+            batalha(posicaoAtual.inimigo);
         }
+    }
+
+    cout << "Você completou o mapa!\n";
+    avancarNivel();
+}
+
+void Jogo::batalha(Inimigo* inimigo) {
+    cout << "Voce esta em batalha contra " << inimigo->getNome() << endl;
+
+    while (heroi->getVida() > 0 && inimigo->estaVivo()) {
+        string escolha;
+        cout << "Deseja atacar ou usar uma pocao? (atacar/pocao): ";
+        cin >> escolha;
+
+        limparConsole();
+
+        if (escolha == "pocao") {
+            usarPocao();
+        } else {
+            cout << "Escolha uma arma do seu cinto (indice de 0 a 4) ou use a arma no topo da mochila (5): ";
+            int escolhaArma;
+            cin >> escolhaArma;
+
+            Item* arma = NULL;
+
+            if (escolhaArma >= 0 && escolhaArma < 5) {
+                arma = heroi->verItemCinto(escolhaArma);
+            } else if (escolhaArma == 5) {
+                arma = heroi->verItemTopoMochila();
+            }
+
+            if (arma != NULL && dynamic_cast<Arma*>(arma)) {
+                Arma* armaEscolhida = dynamic_cast<Arma*>(arma);
+                cout << "Voce esta atacando com a arma: " << armaEscolhida->getNome() << endl;
+                heroi->ataque();
+                inimigo->receberDano(armaEscolhida->getCapacidadeDeAtaque());
+            } else {
+                cout << "Voce atacou sem arma!" << endl;
+                heroi->ataque();
+                inimigo->receberDano(heroi->getForca());
+            }
+
+            if (!inimigo->estaVivo()) {
+                cout << "Voce derrotou o inimigo!" << endl;
+                numInimigos--;
+                break;
+            }
+
+            inimigo->atacar();
+            heroi->receberdano(inimigo->getCapacidadeDeAtaque());
+
+            if (heroi->getVida() <= 0) {
+                cout << "Voce foi derrotado! Fim do jogo!" << endl;
+                exit(0);
+            }
+        }
+    }
+}
+
+void Jogo::usarPocao() {
+    // Primeiro, verifica se há poção no cinto
+    Item* pocaoCinto = NULL;
+    int indiceCinto = -1;
+
+    for (int i = 0; i < 5; ++i) {
+        Item* itemCinto = heroi->verItemCinto(i);
+        if (itemCinto != NULL && dynamic_cast<Pocao*>(itemCinto)) {
+            pocaoCinto = itemCinto;
+            indiceCinto = i;
+            break;
+        }
+    }
+
+    // Verifica se há poção na mochila
+    Item* pocaoMochila = heroi->verItemTopoMochila();
+
+    // Verifica se há poção disponível
+    if (pocaoCinto == NULL && pocaoMochila == NULL) {
+        cout << "Voce nao tem pocoes disponiveis!" << endl;
+        return;
+    }
+
+    // Se houver poções tanto no cinto quanto na mochila, dá a opção de escolher
+    if (pocaoCinto != NULL && pocaoMochila != NULL) {
+        cout << "Voce tem pocoes no cinto e na mochila. Deseja usar a pocao do cinto (1) ou da mochila (2)?" << endl;
+        int escolhaPocao;
+        cin >> escolhaPocao;
+
+        if (escolhaPocao == 1) {
+            heroi->usarpocao(pocaoCinto);
+            heroi->remover_item_cinto(indiceCinto);  // Remove a poção do cinto
+        } else if (escolhaPocao == 2) {
+            heroi->usarpocao(pocaoMochila);
+            heroi->usar_item_mochila();  // Remove a poção da mochila
+        } else {
+            cout << "Opcao invalida, nenhuma pocao usada." << endl;
+        }
+    }
+    // Caso só tenha poção no cinto
+    else if (pocaoCinto != NULL) {
+        heroi->usarpocao(pocaoCinto);
+        heroi->remover_item_cinto(indiceCinto);  // Remove a poção do cinto
+    }
+    // Caso só tenha poção na mochila
+    else if (pocaoMochila != NULL) {
+        heroi->usarpocao(pocaoMochila);
+        heroi->usar_item_mochila();  // Remove a poção da mochila
     }
 }
 
 void Jogo::interagirComItem(Item* item) {
-    // Exemplo de lógica para interagir com um item encontrado
-    cout << "Você encontrou um item: " << item->getNome() << endl;
-    cout << "Deseja pegar o item? (1 - Sim, 0 - Não): ";
-    int escolha;
+    string escolha;
+    cout << "Deseja guardar o item ou deixa-lo descansando na terra? (guardar/deixar): ";
     cin >> escolha;
 
-    if (escolha == 1) {
-        // Pergunta onde o jogador quer colocar o item
-        cout << "Colocar o item no cinto (1) ou na mochila (2)?: ";
+    limparConsole();
+
+    if (escolha == "guardar") {
+        cout << "Onde deseja guardar o item? (1 - Cinto, 2 - Mochila): ";
         int escolhaLocal;
         cin >> escolhaLocal;
 
         if (escolhaLocal == 1) {
-            // Tenta adicionar ao cinto
-            if (heroi->adicionar_item_cinto(item)) {
-                cout << "Você adicionou o item ao cinto!" << endl;
+            cout << "Estado atual do cinto: " << endl;
+            for (int i = 0; i < 5; ++i) {
+                if (heroi->temItemNoCinto(i)) {
+                    cout << "Slot " << i << ": " << heroi->verItemCinto(i)->getNome() << endl;
+                } else {
+                    cout << "Slot " << i << ": vazio" << endl;
+                }
+            }
+
+            cout << "Escolha um slot para guardar o item (0 a 4): ";
+            int escolhaSlot;
+            cin >> escolhaSlot;
+
+            limparConsole();
+
+            if (escolhaSlot >= 0 && escolhaSlot < 5) {
+                if (heroi->adicionar_item_cinto(item, escolhaSlot)) {
+                    cout << "Item adicionado ao cinto no slot " << escolhaSlot << "!" << endl;
+                } else {
+                    cout << "Cinto cheio! Não foi possivel adicionar o item." << endl;
+                }
             } else {
-                cout << "Cinto cheio! Não foi possível adicionar o item." << endl;
+                cout << "Opção invalida! O item foi descartado." << endl;
             }
         } else if (escolhaLocal == 2) {
-            // Tenta adicionar à mochila
             if (heroi->adicionar_item_mochila(item)) {
-                cout << "Você adicionou o item à sua mochila!" << endl;
+                cout << "Item adicionado a mochila!" << endl;
             } else {
-                cout << "Mochila cheia! Não foi possível pegar o item." << endl;
+                cout << "Mochila cheia! Não foi possivel pegar o item." << endl;
             }
         } else {
-            cout << "Opção inválida! O item foi descartado." << endl;
+            cout << "Opcao invalida! O item foi descartado." << endl;
         }
     } else {
-        cout << "Você ignorou o item." << endl;
+        cout << "Voce deixou o item descansando na terra." << endl;
+    }
+}
+
+void Jogo::organizarItens() {
+    string escolha;
+    cout << "Deseja organizar seus itens (descartar algo)? (sim/nao): ";
+    cin >> escolha;
+
+    limparConsole();
+
+    if (escolha == "sim") {
+        cout << "Estado atual do cinto: " << endl;
+        for (int i = 0; i < 5; ++i) {
+            if (heroi->temItemNoCinto(i)) {
+                cout << "Slot " << i << ": " << heroi->verItemCinto(i)->getNome() << endl;
+            } else {
+                cout << "Slot " << i << ": vazio" << endl;
+            }
+        }
+
+        cout << "Item no topo da mochila: " << (heroi->verItemTopoMochila() ? heroi->verItemTopoMochila()->getNome() : "Nenhum") << endl;
+        cout << "Item embaixo do topo da mochila: " << (heroi->verItemSubTopoMochila() ? heroi->verItemSubTopoMochila()->getNome() : "Nenhum") << endl;
+
+        cout << "Escolha de onde deseja remover um item:\n1 - Cinto\n2 - Mochila\n3 - Cancelar\n";
+        int opcao;
+        cin >> opcao;
+
+        limparConsole();
+
+        if (opcao == 1) {
+            int indice;
+            cout << "Escolha o indice do item no cinto (0 a 4): ";
+            cin >> indice;
+            heroi->remover_item_cinto(indice);
+        } else if (opcao == 2) {
+            heroi->usar_item_mochila();
+            cout << "Item removido do topo da mochila." << endl;
+        }
+    } else {
+        cout << "Voce escolheu continuar a jornada." << endl;
+    }
+}
+
+void Jogo::avancarNivel() {
+    string resposta;
+    cout << "Deseja avancar para o proximo nivel? (sim/nao): ";
+    cin >> resposta;
+
+    if (resposta == "sim") {
+        nivelAtual++;
+        if (nivelAtual >= MAX_NIVEIS) {
+            cout << "Voce completou todos os niveis! Parabens!\n";
+            exit(0);
+        }
+        gerarInimigos();
+        gerarItens();
+    } else {
+        cout << "Voce escolheu encerrar a jornada. Ate a proxima!\n";
+        exit(0);
+    }
+}
+
+void Jogo::gerarInimigos() {
+    for (int i = 0; i < MAX_INIMIGOS; ++i) {
+        int tipo = rand() % 3;
+        Inimigo* novoInimigo = NULL;
+        if (tipo == 0) novoInimigo = new Inimigo("Morcego Mutante", 50, 10);
+        else if (tipo == 1) novoInimigo = new Inimigo("Zumbi", 30, 5);
+        else novoInimigo = new Inimigo("Pincher", 40, 7);
+
+        inimigos[numInimigos++] = novoInimigo;
+    }
+}
+
+void Jogo::gerarItens() {
+    for (int i = 0; i < MAX_ITENS; ++i) {
+        int tipo = rand() % 2;
+        Item* novoItem = NULL;
+        if (tipo == 0) novoItem = new Arma("Machado", 5, 15);
+        else novoItem = new Arma("Espada", 3, 10);
+
+        itens[numItens++] = novoItem;
     }
 }
 
 Jogo::~Jogo() {
-    // Libera a memória alocada para os inimigos e itens
     for (int i = 0; i < numInimigos; ++i) {
         delete inimigos[i];
     }
-
     for (int i = 0; i < numItens; ++i) {
         delete itens[i];
     }
-
-    delete heroi; // Libera a memória alocada para o herói
+    delete heroi;
 }

@@ -1,34 +1,28 @@
+//INTEGRANTES SERGIO LUIS FILIPPIN 2259500
+//              IGOR LUIS DIAS 2199713
+//              VINICIUS BRANQUINHO 2187258
+#include "Heroi.h"
+#include "Jogo.h"
+#include "Mapa.h"
+#include "Item.h"
+#include "Inimigo.h"
 #include <iostream>
-#include "Heroi.h"   // Inclui a definição da classe Heroi
-#include "Jogo.h"    // Inclui a definição da classe Jogo
-#include "Mapa.h"    // Inclui a definição da classe Mapa
-#include "Item.h"    // Inclui a definição da classe Item
-#include "Inimigo.h" // Inclui a definição da classe Inimigo
+
+using namespace std;
 
 int main() {
-    // Bem-vindo ao jogo
-    std::cout << "Bem-vindo ao RPG!\n";
 
-    // Criar o herói (nome, vida e força podem ser personalizadas)
-    std::string nomeHeroi;
-    std::cout << "Digite o nome do seu herói: ";
-    std::cin >> nomeHeroi;
+    cout << "Bem-vindo ao RPG!\n";
 
-    int vidaHeroi = 100;  // Definimos um valor padrão para os pontos de vida do herói
-    int forcaHeroi = 10;  // Definimos um valor padrão para a força do herói
+    string nomeHeroi;
+    cout << "Digite o nome do seu heroi: ";
+    cin >> nomeHeroi;
 
-    // Instanciação do herói
-    Heroi* heroi = new Heroi(nomeHeroi, vidaHeroi, forcaHeroi);
-
-    // Criar o jogo e passar o herói para ele
+    Heroi* heroi = new Heroi(nomeHeroi, 100, 10);
     Jogo jogo(heroi);
 
-    // Iniciar o jogo
     jogo.iniciar();
 
-    // Ao finalizar o jogo, liberar memória
     delete heroi;
-
     return 0;
 }
-  

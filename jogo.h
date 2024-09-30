@@ -1,42 +1,39 @@
+//INTEGRANTES SERGIO LUIS FILIPPIN 2259500
+//              IGOR LUIS DIAS 2199713
+//              VINICIUS BRANQUINHO 2187258
 #ifndef JOGO_H
 #define JOGO_H
 
-#include "Heroi.h"   // Incluir o herói
-#include "Inimigo.h" // Incluir inimigos
-#include "Item.h"    // Incluir itens
-#include "Mapa.h"    // Incluir o mapa
+#include "Heroi.h"
+#include "Inimigo.h"
+#include "Item.h"
+#include "Mapa.h"
 
 class Jogo {
 private:
-    Heroi* heroi;                                 // O herói controlado pelo jogador
-    static const int MAX_INIMIGOS = 10;           // Número máximo de inimigos em um nível
-    static const int MAX_ITENS = 10;              // Número máximo de itens em um nível
-    static const int MAX_NIVEIS = 5;              // Número máximo de níveis no jogo
+    Heroi* heroi;
+    static const int MAX_INIMIGOS = 10;
+    static const int MAX_ITENS = 10;
+    static const int MAX_NIVEIS = 5;
 
-    Inimigo* inimigos[MAX_INIMIGOS];              // Array de ponteiros para inimigos em cada nível
-    Item* itens[MAX_ITENS];                       // Array de ponteiros para itens em cada nível
-    int numInimigos;                              // Número de inimigos no nível atual
-    int numItens;                                 // Número de itens no nível atual
-    int nivelAtual;                               // Índice do nível atual (começa no 0)
+    Inimigo* inimigos[MAX_INIMIGOS];
+    Item* itens[MAX_ITENS];
+    int numInimigos;
+    int numItens;
+    int nivelAtual;
 
-    void gerarInimigos();                         // Gera os inimigos do nível
-    void gerarItens();                            // Gera os itens do nível
-    void batalha(Inimigo* inimigo);               // Método para executar batalhas
-    void interagirComItem(Item* item);            // Método para interagir com itens
+    void gerarInimigos();
+    void gerarItens();
+    void batalha(Inimigo* inimigo);
+    void interagirComItem(Item* item);
+    void organizarItens();  // Declaração de organizarItens()
+    void usarPocao();       // Declaração de usarPocao()
 
 public:
-    // Construtor
     Jogo(Heroi* heroi);
-
-    // Método para iniciar o jogo
     void iniciar();
-
-    // Métodos de controle de níveis
-    void avancarNivel();                          // Avança para o próximo nível
-    bool nivelCompleto() const;                   // Verifica se o nível atual foi completado
-
-    // Destrutor
+    void avancarNivel();
     ~Jogo();
 };
 
-#endif // JOGO_H
+#endif
