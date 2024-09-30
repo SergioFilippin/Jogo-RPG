@@ -1,45 +1,44 @@
+//INTEGRANTES SERGIO LUIS FILIPPIN 2259500
+//              IGOR LUIS DIAS 2199713
+//              VINICIUS BRANQUINHO 2187258
+
 #ifndef HEROI_H
 #define HEROI_H
 
-#include <string>
-#include "Item.h" // Certifique-se de incluir o header de Item
+#include "Item.h"
 
 class Heroi {
-public:
-    // Construtor
-    Heroi(const std::string& nome, int vida, int forca);
-
-    // Gerenciamento de Item
-    bool adicionar_item_mochila(Item* item);   // Adiciona item à mochila
-    bool adicionar_item_cinto(Item* item);     // Adiciona item ao cinto
-    Item* remover_item_cinto(int indice);      // Remove item do cinto por índice
-    Item* usar_item_mochila();                 // Usa o item no topo da mochila
-
-    // Métodos de combate
-    void ataque();                             // Herói ataca
-    void receberdano(int dano);                // Herói recebe dano
-    void usarpocao(Item* pocao);               // Herói usa uma poção
-
-    // Métodos de acesso (getters)
-    int getVida() const;                       // Retorna a vida atual do herói
-    int getForca() const;                      // Retorna a força do herói
-
 private:
-    std::string nome;                          // Nome do herói
-    int vida;                                  // Pontos de vida do herói
-    int forca;                                 // Força do herói
+    std::string nome;
+    int vida;
+    int forca;
+    Item* cinto[5]; // 5 slots no cinto
+    Item** mochila; // Mochila será um array dinâmico de ponteiros para Item
+    int capacidadeMochila; // Capacidade atual da mochila (tamanho do array)
+    int topoMochila; // Índice do último item na mochila (-1 significa vazio)
 
-    // Definição das constantes de capacidade
-    static const int VIDA_MAXIMA = 200;             // Vida máxima do herói
-    static const int CAPACIDADE_MAX_CINTO = 5;      // Capacidade máxima do cinto
-    static const int CAPACIDADE_MAX_MOCHILA = 10;   // Capacidade máxima da mochila
-    static const int CAPACIDADE_MAX_PESO_MOCHILA = 100; // Peso máximo que a mochila pode carregar
+public:
+    Heroi(std::string nome, int vida, int forca);
+    ~Heroi();
 
-    // Cinto e Mochila
-    Item* cinto[CAPACIDADE_MAX_CINTO];        // Array de ponteiros para itens no cinto
-    Item* mochila[CAPACIDADE_MAX_MOCHILA];    // Array de ponteiros para itens na mochila
-    int topoMochila;                          // Controle do topo da mochila (usado como uma pilha)
-    int pesoAtualMochila;                     // Peso atual da mochila
+    // Funções para manipulação dos itens no cinto
+    Item* remover_item_cinto(int slot); // Retorna o item removido
+    bool adicionar_item_cinto(Item* item, int slot);
+    Item* verItemCinto(int slot) const;
+    bool temItemNoCinto(int slot) const;
+
+    // Funções para manipulação dos itens na mochila
+    bool adicionar_item_mochila(Item* item); // Adiciona um item no topo da mochila
+    Item* usar_item_mochila(); // Retira o item no topo da mochila
+    Item* verItemTopoMochila() const;
+    Item* verItemSubTopoMochila() const;
+
+    // Funções de batalha e atributos
+    void ataque();
+    void receberdano(int dano);
+    int getVida() const;
+    int getForca() const;
+    void usarpocao(Item* pocao);
 };
 
-#endif // HEROI_H
+#endif

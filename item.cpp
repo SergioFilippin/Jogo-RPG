@@ -1,3 +1,6 @@
+//INTEGRANTES SERGIO LUIS FILIPPIN 2259500
+//              IGOR LUIS DIAS 2199713
+//              VINICIUS BRANQUINHO 2187258
 #include "Item.h"
 #include <iostream>
 
@@ -45,5 +48,5 @@ int Pocao::getCapacidadeDeCura() const {
 
 // Mostra os detalhes da poção
 void Pocao::mostrarDetalhes() const {
-    std::cout << "Poção: " << getNome() << ", Cura: " << capacidadeDeCura << ", Peso: " << getPeso() << std::endl;
+    std::cout << "Pocao: " << getNome() << ", Cura: " << capacidadeDeCura << ", Peso: " << getPeso() << std::endl;
 }
